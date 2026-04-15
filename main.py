@@ -146,52 +146,94 @@ footer_label = ctk.CTkLabel(
     font=ctk.CTkFont(size=12)
 )
 
-def show_dashboard(attempts):
+def logout():
+    global current_user
+    current_user = None
+
+    dashboard_frame.pack_forget()
+    left_frame.pack(side="left", fill="both", expand=True)
+    right_frame.pack(side="right", fill="both", expand=True)
+
+
+def change_pass():
+    popup = ctk.CTkToplevel(app)
+    popup.geometry("400x250")
+    popup.title("Change Password")
+
+    label = ctk.CTkLabel(popup, text="Enter New Password")
+    label.pack(pady=10)
+
+    entry = ctk.CTkEntry(popup, placeholder_text="New Password", show="*")
+    entry.pack(pady=10)
+
+    def update():
+        change_password(current_user, entry.get())
+        popup.destroy()
+
+    ctk.CTkButton(popup, text="Update Password", command=update).pack(pady=20)
+
+button_frame = ctk.CTkFrame(dashboard_frame, fg_color="#0f172a")
+
+change_btn = ctk.CTkButton(
+    button_frame,
+    text="Change Password",
+    width=200,
+    height=45,
+    corner_radius=20,
+    command=change_pass
+)
+
+logout_btn = ctk.CTkButton(
+    button_frame,
+    text="Logout",
+    width=200,
+    height=45,
+    corner_radius=15,
+    fg_color="#ef4444",
+    hover_color="#dc2626",
+    command=logout
+)
+
+change_btn.pack(side="left", padx=20)
+logout_btn.pack(side="right", padx=20)
+
+def show_dashboard(previous_attempts):
     left_frame.pack_forget()
     right_frame.pack_forget()
 
     dashboard_frame.pack(fill="both", expand=True)
 
-    welcome_label.configure(text=f"Welcome, {current_user}!")
-    welcome_label.pack(pady=(80, 30))
+    welcome_label.pack_forget()
+    info_card.pack_forget()
+    button_frame.pack_forget()
+    footer_label.pack_forget()
 
-    attempts, last_login = get_user_info(current_user)
+    welcome_label.configure(text=f"Welcome, {current_user}!")
+
+    current_attempts, last_login = get_user_info(current_user)
 
     info_text = f"""
-Failed Login Attempts: {attempts}
+Failed Login Attempts Before Success: {previous_attempts}
+
+Current Failed Login Attempts: {current_attempts}
 
 Last Login:
 {last_login}
 """
     info_label.configure(text=info_text)
 
+    # pack lại theo đúng thứ tự
+    welcome_label.pack(pady=(80, 30))
     info_card.pack(pady=20)
     info_label.place(relx=0.5, rely=0.5, anchor="center")
-
-    button_frame = ctk.CTkFrame(dashboard_frame, fg_color="#0f172a")
     button_frame.pack(pady=30)
+    footer_label.pack(side="bottom", pady=20)
 
-    ctk.CTkButton(
-        button_frame,
-        text="Change Password",
-        width=200,
-        height=45,
-        corner_radius=20,
-        command = change_pass
-    ).pack(side="left", padx=20)
-
-    ctk.CTkButton(
-        button_frame,
-        text="Logout",
-        width=200,
-        height=45,
-        corner_radius=15,
-        fg_color="#ef4444",
-        hover_color="#dc2626",
-        command=logout
-    ).pack(side="right", padx=20)
 
 def logout():
+    global current_user
+    current_user = None
+
     dashboard_frame.pack_forget()
     left_frame.pack(side="left", fill="both", expand=True)
     right_frame.pack(side="right", fill="both", expand=True)
